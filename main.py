@@ -9,28 +9,36 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
+@app.get("/start")
+async def server_start():
+    output = execute_linux_cmd("./sdtdserver st")
+    return {"message": f"Starting Server", "stdout": output}
 
-@app.get("/start/{server}")
-async def say_hello(server: str):
-    return {"message": f"Starting {server}"}
+@app.get("/stop")
+async def server_stop():
+    output = execute_linux_cmd("./sdtdserver sp")
+    return {"message": f"Stopping Server", "stdout": output}
 
-@app.get("/stop/{server}")
-async def say_hello(server: str):
-    return {"message": f"Stopping {server}"}
+@app.get("/update")
+async def server_update():
+    output = execute_linux_cmd("./sdtdserver u")
+    return {"message": f"Updating Server", "stdout": output}
 
-@app.get("/update/{server}")
-async def say_hello(server: str):
-    return {"message": f"Updating {server}"}
+@app.get("/status")
+async def server_status():
+    output = execute_linux_cmd("./sdtdserver dt")
+    return {"message": f"Status of Server", "stdout": output}
 
-@app.get("/status/{server}")
-async def say_hello(server: str):
-    output = execute_linux_cmd("date")
-    return {"message": f"Status of {server}", "Time": output}
-
+@app.get("/test")
+async def server_test():
+    return {"message": f"Test Sucessfully"}
 
 def execute_linux_cmd(cmd: str):
-    temp = subprocess.Popen([cmd], stdout=subprocess.PIPE)
-    output = temp.communicate()[0].decode('utf-8').replace('\n', '')
+    try:
+        temp = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE)
+        output = temp.communicate()[0].decode('utf-8').replace('\n', '')
+    except Exception as e:
+        output = f"Error occured: {e}"
     return output
 
 if __name__ == '__main__':
